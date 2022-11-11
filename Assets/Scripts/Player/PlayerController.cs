@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     public State<PlayerController> PlayerIdleState;
     public State<PlayerController> PlayerRunningState;
     public State<PlayerController> PlayerAttackingState;
+    public State<PlayerController> PlayerWalkingState;
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
         PlayerIdleState = new PlayerIdleState(this, mFsm);
         PlayerRunningState = new PlayerRunningState(this, mFsm);
         PlayerAttackingState = new PlayerAttackingState(this, mFsm);
+        PlayerWalkingState = new PlayerWalkingState(this,mFsm);
     }
 
     private void Start()

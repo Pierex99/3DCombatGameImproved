@@ -22,9 +22,9 @@ public class PlayerIdleState : State<PlayerController>
         base.OnLogicUpdate();
         if (InputManager.Instance.Movement != Vector2.zero)
         {
-            mAnimator.SetFloat("Speed", 1f, mController.dampTime, Time.deltaTime);
+            mAnimator.SetFloat("Speed", 0.5f, mController.dampTime, Time.deltaTime);
             // Cambiar a un estado RunningState
-            mFsm.ChangeState(mController.PlayerRunningState);
+            mFsm.ChangeState(mController.PlayerWalkingState);
         }else
         {
             mAnimator.SetFloat("Speed", 0f, mController.dampTime, Time.deltaTime);

@@ -9,10 +9,15 @@ public class InputManager : MonoBehaviour, InputSystemPlayer.IPlayerActions
     public static InputManager Instance { get; private set; }
     public Vector2 Movement { get; private set;}
 
+    public bool isRunning {get;private set;}  = false;
+
     private InputSystemPlayer mInputPlayer;
 
     private event EventHandler OnJumpHandler;
     private event EventHandler OnAttack1Handler;
+
+    private event EventHandler OnRunningHandler;
+
 
     void Awake()
     {
@@ -52,6 +57,10 @@ public class InputManager : MonoBehaviour, InputSystemPlayer.IPlayerActions
         OnAttack1Handler += handler;
     }
 
+    public void AddOnRunningHandler(EventHandler handler)
+    {
+        OnRunningHandler += handler;
+    }
     public void OnFreeLookView(InputAction.CallbackContext context)
     {}
 
@@ -60,6 +69,18 @@ public class InputManager : MonoBehaviour, InputSystemPlayer.IPlayerActions
         if (context.performed)
         {
             OnAttack1Handler?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public void OnRun(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            isRunning = true;
+            OnRunningHandler?.Invoke(this,EventArgs.Empty);
+        }
+        if(context.canceled){
+            isRunning = false;
         }
     }
 }

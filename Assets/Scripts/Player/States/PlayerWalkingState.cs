@@ -3,15 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerRunningState : State<PlayerController>
+public class PlayerWalkingState : State<PlayerController>
 {
     private CharacterController mCharacterController;
     private Animator mAnimator;
-
-    public PlayerRunningState(
+    public PlayerWalkingState(
         PlayerController controller, 
-        FiniteStateMachine<PlayerController> fsm) : base(controller, fsm)
-    {}
+        FiniteStateMachine<PlayerController> fsm) 
+        : base(controller, fsm)
+    {
+    }
 
     public override void HandleInput()
     {
@@ -25,7 +26,7 @@ public class PlayerRunningState : State<PlayerController>
         Vector3 movementVector = CalculateDirection(InputManager.Instance.Movement);
 
         mCharacterController.Move(
-            movementVector * Time.deltaTime * mController.speed
+            movementVector * Time.deltaTime * mController.speed * 0.5f
         );
 
         if (InputManager.Instance.Movement == Vector2.zero)
@@ -34,14 +35,9 @@ public class PlayerRunningState : State<PlayerController>
             // Regresar al Idle State
             mFsm.ChangeState(mController.PlayerIdleState);
         }
-        else if (!InputManager.Instance.isRunning){
-            mAnimator.SetFloat("Speed", 0.5f, mController.dampTime, Time.deltaTime);
-            // Regresar al Idle State
-            mFsm.ChangeState(mController.PlayerWalkingState);
-        }
         else
         {
-            mAnimator.SetFloat("Speed", 1f, mController.dampTime, Time.deltaTime);
+            mAnimator.SetFloat("Speed", 0.5f, mController.dampTime, Time.deltaTime);
             // Rotation
             mController.transform.rotation = Quaternion.Lerp(
                 mController.transform.rotation,
@@ -50,20 +46,23 @@ public class PlayerRunningState : State<PlayerController>
             );
         }
     }
-
     public override void OnPhysicsUpdate()
     {
         base.OnPhysicsUpdate();
     }
-
     public override void OnStart()
     {
         base.OnStart();
-
         InputManager.Instance.AddOnAttackHandler(Attack1);
+        InputManager.Instance.AddOnRunningHandler(Run);
 
         mCharacterController = mController.GetComponent<CharacterController>();
         mAnimator = mController.GetComponent<Animator>();
+    }
+
+    private void Run(object sender, EventArgs e)
+    {
+        mFsm.ChangeState(mController.PlayerRunningState);
     }
 
     private void Attack1(object sender, EventArgs e)
@@ -75,7 +74,6 @@ public class PlayerRunningState : State<PlayerController>
     {
         base.OnStop();
     }
-
     private Vector3 CalculateDirection(Vector2 mov)
     {
         var dirForward = mController.MainCamera.transform.forward;
@@ -88,5 +86,7 @@ public class PlayerRunningState : State<PlayerController>
         dirRight.Normalize();
 
         return dirForward * mov.y + dirRight * mov.x;
-    }
+    }  
+    
+
 }
